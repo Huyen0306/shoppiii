@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/services/cart_service.dart';
 import '../../../core/widgets/banner_slider.dart';
 import '../../../core/widgets/product_card.dart';
 import '../../product/pages/product_detail_page.dart';
@@ -159,30 +161,36 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    const Icon(Iconsax.bag_2, color: Colors.white, size: 26),
-                    Positioned(
-                      top: -4,
-                      right: -4,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Text(
-                          '2',
-                          style: TextStyle(
-                            color: AppColors.redPrimary,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                Consumer<CartService>(
+                  builder: (context, cartService, child) {
+                    final cartCount = cartService.totalItems;
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        const Icon(Iconsax.bag_2, color: Colors.white, size: 26),
+                        if (cartCount > 0)
+                          Positioned(
+                            top: -4,
+                            right: -4,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                cartCount > 99 ? '99+' : '$cartCount',
+                                style: const TextStyle(
+                                  color: AppColors.redPrimary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  ],
+                      ],
+                    );
+                  },
                 ),
               ],
             ),

@@ -33,4 +33,15 @@ class ProductModel {
       count: json['rating'] != null ? json['rating']['count'] : null,
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'price': price,
+      'description': description,
+      'category': category,
+      'image': image,
+      'rating': {'rate': rating, 'count': count},
+    };
+  }
 }

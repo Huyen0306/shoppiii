@@ -1,12 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/services/cart_service.dart';
+import '../../cart/pages/cart_page.dart';
 import '../../home/data/models/product_model.dart';
 
-class ProductDetailPage extends StatelessWidget {
+class ProductDetailPage extends StatefulWidget {
   final ProductModel product;
 
   const ProductDetailPage({super.key, required this.product});
+
+  @override
+  State<ProductDetailPage> createState() => _ProductDetailPageState();
+}
+
+class _ProductDetailPageState extends State<ProductDetailPage> {
+  Future<void> _handleAddToCart() async {
+    final cartService = context.read<CartService>();
+    await cartService.addToCart(widget.product);
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đã thêm sản phẩm vào giỏ hàng'),
+          duration: Duration(seconds: 2),
+          backgroundColor: AppColors.redPrimary,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,41 +75,54 @@ class ProductDetailPage extends StatelessWidget {
                     ),
                     onPressed: () {},
                   ),
-                  IconButton(
-                    icon: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.4),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Iconsax.bag_2,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                        const Positioned(
-                          top: -2,
-                          right: -2,
-                          child: CircleAvatar(
-                            radius: 8,
-                            backgroundColor: AppColors.redPrimary,
-                            child: Text(
-                              '2',
-                              style: TextStyle(
+                  Consumer<CartService>(
+                    builder: (context, cartService, child) {
+                      final cartCount = cartService.totalItems;
+                      return IconButton(
+                        icon: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Iconsax.bag_2,
                                 color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
+                                size: 20,
                               ),
                             ),
-                          ),
+                            if (cartCount > 0)
+                              Positioned(
+                                top: -2,
+                                right: -2,
+                                child: CircleAvatar(
+                                  radius: 8,
+                                  backgroundColor: AppColors.redPrimary,
+                                  child: Text(
+                                    cartCount > 99 ? '99+' : '$cartCount',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                      ],
-                    ),
-                    onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CartPage(),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                   IconButton(
                     icon: Container(
@@ -109,7 +145,7 @@ class ProductDetailPage extends StatelessWidget {
                     fit: StackFit.expand,
                     children: [
                       Image.network(
-                        product.image,
+                        widget.product.image,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) =>
                             Container(color: Colors.grey[200]),
@@ -143,7 +179,7 @@ class ProductDetailPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            '\$${product.price}',
+                            '\$${widget.product.price}',
                             style: const TextStyle(
                               color: AppColors.redPrimary,
                               fontSize: 24,
@@ -160,7 +196,7 @@ class ProductDetailPage extends StatelessWidget {
                           ),
                           const Spacer(),
                           Text(
-                            'Đã bán ${product.count ?? 0}',
+                            'Đã bán ${widget.product.count ?? 0}',
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 12,
@@ -201,7 +237,7 @@ class ProductDetailPage extends StatelessWidget {
 
                       // Title
                       Text(
-                        product.title,
+                        widget.product.title,
                         style: const TextStyle(
                           fontSize: 16,
                           height: 1.4,
@@ -291,7 +327,7 @@ class ProductDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        product.description,
+                        widget.product.description,
                         style: TextStyle(
                           fontSize: 14,
                           height: 1.5,
@@ -330,45 +366,50 @@ class ProductDetailPage extends StatelessWidget {
                   const SizedBox(width: 2), // Tighter spacing
                   Container(width: 1, height: 40, color: Colors.grey[200]),
                   const SizedBox(width: 2), // Tighter spacing
-                  _buildBottomIcon(
-                    Iconsax.bag_2,
-                    'Thêm vào Giỏ',
-                    const Color(0xFF00BFA5),
+                  GestureDetector(
+                    onTap: _handleAddToCart,
+                    child: _buildBottomIcon(
+                      Iconsax.bag_2,
+                      'Thêm vào Giỏ',
+                      const Color(0xFF00BFA5),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Container(
-                      height: 44,
-                      decoration: const BoxDecoration(
-                        color: AppColors.redPrimary,
-                        borderRadius: BorderRadius.only(
-                          // Simplified rect shape as per design usually
-                          topLeft: Radius.circular(4),
-                          bottomLeft: Radius.circular(4),
-                          topRight: Radius.circular(4),
-                          bottomRight: Radius.circular(4),
+                    child: GestureDetector(
+                      onTap: _handleAddToCart,
+                      child: Container(
+                        height: 44,
+                        decoration: const BoxDecoration(
+                          color: AppColors.redPrimary,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(4),
+                            bottomLeft: Radius.circular(4),
+                            topRight: Radius.circular(4),
+                            bottomRight: Radius.circular(4),
+                          ),
                         ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'Mua với voucher',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Thêm vào giỏ',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                          Text(
-                            '\$${product.price}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              '\$${widget.product.price}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

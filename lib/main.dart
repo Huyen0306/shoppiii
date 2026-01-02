@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'core/services/cart_service.dart';
 import 'core/theme/app_theme.dart';
 import 'main_navigation.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final cartService = CartService();
+  await cartService.init();
   runApp(const MyApp());
 }
 
@@ -11,11 +16,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Shoppiii',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: const MainNavigation(),
+    return ChangeNotifierProvider.value(
+      value: CartService(),
+      child: MaterialApp(
+        title: 'Shoppiii',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        home: const MainNavigation(),
+      ),
     );
   }
 }
