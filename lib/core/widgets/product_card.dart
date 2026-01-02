@@ -201,7 +201,7 @@ class ProductCard extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF5722),
+                        color: AppColors.redPrimary,
                         borderRadius: BorderRadius.circular(1),
                       ),
                       child: const Row(

@@ -3,9 +3,32 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/product_card.dart';
+import '../data/repositories/product_repository.dart';
+import '../data/models/product_model.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final ProductRepository _productRepository = ProductRepository();
+  late Future<List<ProductModel>> _productsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _productsFuture = _productRepository.getProducts();
+  }
+
+  // Helper to format currency
+  String _formatPrice(double price) {
+    // Basic wrapper to show USD or convert roughly to VND if preferred.
+    // Keeping it simple as USD for this API.
+    return '\$${price.toStringAsFixed(2)}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +104,7 @@ class HomePage extends StatelessWidget {
                         child: const Text(
                           '2',
                           style: TextStyle(
-                            color: Color(0xFFEE4D2D),
+                            color: AppColors.redPrimary,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -100,35 +123,63 @@ class HomePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Gợi ý hôm nay',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFEE4D2D),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
+                  // const Text(
+                  //   'Gợi ý hôm nay',
+                  //   style: TextStyle(
+                  //     fontSize: 16,
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Color(0xFFEE4D2D),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 12),
                   Expanded(
-                    child: MasonryGridView.count(
-                      padding: const EdgeInsets.only(bottom: 100),
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      itemCount: 10,
-                      itemBuilder: (context, index) {
-                        return ProductCard(
-                          imageAspectRatio: index % 2 == 0 ? 1.0 : 0.90,
-                          imageUrl:
-                              'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
-                          title:
-                              '(Fullbox - Loại 1) Giày thể thao nữ Safifan gồm 3 màu trắng kem, hồng, xám',
-                          price: '84.550đ',
-                          discount: '-53%',
-                          rating: 4.8,
-                          soldCount: '6k+',
-                          shippingText: '2 - 4 ngày',
-                          isLive: true,
+                    child: FutureBuilder<List<ProductModel>>(
+                      future: _productsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.redPrimary,
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return const Center(child: Text('No products found'));
+                        }
+
+                        final products = snapshot.data!;
+
+                        return MasonryGridView.count(
+                          padding: const EdgeInsets.only(bottom: 100),
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          itemCount: products.length,
+                          itemBuilder: (context, index) {
+                            final product = products[index];
+                            return ProductCard(
+                              imageAspectRatio: index % 2 == 0
+                                  ? 1.0
+                                  : 0.90, // Varied aspect ratio
+                              imageUrl: product.image,
+                              title: product.title,
+                              price: _formatPrice(product.price),
+                              discount: index % 3 == 0
+                                  ? '-20%'
+                                  : null, // Mock discount
+                              rating: product.rating,
+                              soldCount: product.count != null
+                                  ? '${product.count}'
+                                  : null,
+                              shippingText: '3 - 5 Days',
+                              isLive: index % 5 == 0, // Mock status
+                            );
+                          },
                         );
                       },
                     ),
