@@ -16,12 +16,54 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ProductRepository _productRepository = ProductRepository();
-  late Future<List<ProductModel>> _productsFuture;
+  final TextEditingController _searchController = TextEditingController();
+
+  List<ProductModel> _allProducts = [];
+  List<ProductModel> _filteredProducts = [];
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _productsFuture = _productRepository.getProducts();
+    _loadProducts();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      final products = await _productRepository.getProducts();
+      setState(() {
+        _allProducts = products;
+        _filteredProducts = products;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredProducts = _allProducts;
+      } else {
+        _filteredProducts = _allProducts
+            .where(
+              (product) =>
+                  product.title.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList();
+      }
+    });
   }
 
   // Helper to format currency
@@ -63,6 +105,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Icon(
                           Iconsax.search_normal,
@@ -70,20 +113,46 @@ class _HomePageState extends State<HomePage> {
                           size: 20,
                         ),
                         const SizedBox(width: 8),
-                        const Expanded(
-                          child: Text(
-                            'Tingoan Store',
-                            style: TextStyle(
-                              color: AppColors.redPrimary,
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: _onSearchChanged,
+                            textAlignVertical: TextAlignVertical.center,
+                            decoration: const InputDecoration(
+                              hintText: 'Tingoan Store',
+                              hintStyle: TextStyle(
+                                color: AppColors
+                                    .redPrimary, // Or grey if preferred
+                                fontSize: 14,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                            ),
+                            style: const TextStyle(
+                              color: Colors.black87,
                               fontSize: 14,
                             ),
                           ),
                         ),
-                        const Icon(
-                          Iconsax.camera,
-                          color: Colors.grey,
-                          size: 20,
-                        ),
+                        if (_searchController.text.isNotEmpty)
+                          GestureDetector(
+                            onTap: () {
+                              _searchController.clear();
+                              _onSearchChanged('');
+                            },
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.grey,
+                              size: 16,
+                            ),
+                          )
+                        else
+                          const Icon(
+                            Iconsax.camera,
+                            color: Colors.grey,
+                            size: 20,
+                          ),
                       ],
                     ),
                   ),
@@ -140,58 +209,49 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                  FutureBuilder<List<ProductModel>>(
-                    future: _productsFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const SliverToBoxAdapter(
-                          child: Padding(
-                            padding: EdgeInsets.all(20.0),
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.redPrimary,
-                              ),
-                            ),
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return SliverToBoxAdapter(
-                          child: Center(
-                            child: Text('Error: ${snapshot.error}'),
-                          ),
-                        );
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const SliverToBoxAdapter(
-                          child: Center(child: Text('No products found')),
-                        );
-                      }
 
-                      final products = snapshot.data!;
-
-                      return SliverMasonryGrid.count(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childCount: products.length,
-                        itemBuilder: (context, index) {
-                          final product = products[index];
-                          return ProductCard(
-                            imageAspectRatio: index % 2 == 0 ? 1.0 : 0.90,
-                            imageUrl: product.image,
-                            title: product.title,
-                            price: _formatPrice(product.price),
-                            discount: index % 3 == 0 ? '-20%' : null,
-                            rating: product.rating,
-                            soldCount: product.count != null
-                                ? '${product.count}'
-                                : null,
-                            shippingText: '3 - 5 Days',
-                            isLive: index % 5 == 0,
-                          );
-                        },
-                      );
-                    },
-                  ),
+                  if (_isLoading)
+                    const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.redPrimary,
+                          ),
+                        ),
+                      ),
+                    )
+                  else if (_errorMessage != null)
+                    SliverToBoxAdapter(
+                      child: Center(child: Text('Error: $_errorMessage')),
+                    )
+                  else if (_filteredProducts.isEmpty)
+                    const SliverToBoxAdapter(
+                      child: Center(child: Text('No products found')),
+                    )
+                  else
+                    SliverMasonryGrid.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childCount: _filteredProducts.length,
+                      itemBuilder: (context, index) {
+                        final product = _filteredProducts[index];
+                        return ProductCard(
+                          imageAspectRatio: index % 2 == 0 ? 1.0 : 0.90,
+                          imageUrl: product.image,
+                          title: product.title,
+                          price: _formatPrice(product.price),
+                          discount: index % 3 == 0 ? '-20%' : null,
+                          rating: product.rating,
+                          soldCount: product.count != null
+                              ? '${product.count}'
+                              : null,
+                          shippingText: '3 - 5 Days',
+                          isLive: index % 5 == 0,
+                        );
+                      },
+                    ),
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
               ),
