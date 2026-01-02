@@ -29,7 +29,12 @@ class CartService extends ChangeNotifier {
   List<CartItem> _cartItems = [];
   List<CartItem> get cartItems => _cartItems;
 
-  int get totalItems => _cartItems.fold(0, (sum, item) => sum + item.quantity);
+  // Số lượng sản phẩm (số items trong giỏ)
+  int get totalItems => _cartItems.length;
+  
+  // Tổng số lượng items (tổng quantity của tất cả sản phẩm)
+  int get totalQuantity => _cartItems.fold(0, (sum, item) => sum + item.quantity);
+  
   double get totalPrice => _cartItems.fold(
     0,
     (sum, item) => sum + (item.product.price * item.quantity),
