@@ -37,24 +37,19 @@ class FloatingBottomNavBar extends StatelessWidget {
                   isActive: currentIndex == 0,
                 ),
                 _buildNavItem(
-                  icon: Iconsax.shop,
+                  icon: Iconsax.bag_2,
                   index: 1,
                   isActive: currentIndex == 1,
                 ),
                 _buildNavItem(
-                  icon: Iconsax.video_play,
+                  icon: Iconsax.notification,
                   index: 2,
                   isActive: currentIndex == 2,
                 ),
                 _buildNavItem(
-                  icon: Iconsax.notification,
+                  icon: Iconsax.user_tag,
                   index: 3,
                   isActive: currentIndex == 3,
-                ),
-                _buildNavItem(
-                  icon: Iconsax.user_tag,
-                  index: 4,
-                  isActive: currentIndex == 4,
                 ),
               ],
             ),

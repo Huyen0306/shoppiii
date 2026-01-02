@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/banner_slider.dart';
 import '../../../core/widgets/product_card.dart';
+import '../../product/pages/product_detail_page.dart';
 import '../data/repositories/product_repository.dart';
 import '../data/models/product_model.dart';
 
@@ -237,18 +238,29 @@ class _HomePageState extends State<HomePage> {
                       childCount: _filteredProducts.length,
                       itemBuilder: (context, index) {
                         final product = _filteredProducts[index];
-                        return ProductCard(
-                          imageAspectRatio: index % 2 == 0 ? 1.0 : 0.90,
-                          imageUrl: product.image,
-                          title: product.title,
-                          price: _formatPrice(product.price),
-                          discount: index % 3 == 0 ? '-20%' : null,
-                          rating: product.rating,
-                          soldCount: product.count != null
-                              ? '${product.count}'
-                              : null,
-                          shippingText: '3 - 5 Days',
-                          isLive: index % 5 == 0,
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ProductDetailPage(product: product),
+                              ),
+                            );
+                          },
+                          child: ProductCard(
+                            imageAspectRatio: index % 2 == 0 ? 1.0 : 0.90,
+                            imageUrl: product.image,
+                            title: product.title,
+                            price: _formatPrice(product.price),
+                            discount: index % 3 == 0 ? '-20%' : null,
+                            rating: product.rating,
+                            soldCount: product.count != null
+                                ? '${product.count}'
+                                : null,
+                            shippingText: '3 - 5 Days',
+                            isLive: index % 5 == 0,
+                          ),
                         );
                       },
                     ),
