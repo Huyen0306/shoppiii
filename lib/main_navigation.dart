@@ -33,11 +33,19 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
-      body: IndexedStack(index: _selectedIndex, children: _pages),
-      bottomNavigationBar: FloatingBottomNavBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+      body: Stack(
+        children: [
+          IndexedStack(index: _selectedIndex, children: _pages),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: FloatingBottomNavBar(
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
+            ),
+          ),
+        ],
       ),
     );
   }

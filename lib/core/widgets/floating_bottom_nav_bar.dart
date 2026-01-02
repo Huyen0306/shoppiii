@@ -21,11 +21,11 @@ class FloatingBottomNavBar extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.white.withOpacity(0.4),
+              color: AppColors.redPrimary.withOpacity(0.70),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -77,9 +77,7 @@ class FloatingBottomNavBar extends StatelessWidget {
         curve: Curves.easeInOutCubic,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isActive
-              ? AppColors.primary.withOpacity(0.1)
-              : Colors.transparent,
+          color: isActive ? Colors.white.withOpacity(0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: AnimatedSwitcher(
@@ -91,7 +89,7 @@ class FloatingBottomNavBar extends StatelessWidget {
             icon,
             key: ValueKey<int>(isActive ? index + 10 : index),
             size: 24,
-            color: isActive ? AppColors.primary : AppColors.textSecondary,
+            color: isActive ? Colors.white : Colors.white.withOpacity(0.6),
           ),
         ),
       ),
