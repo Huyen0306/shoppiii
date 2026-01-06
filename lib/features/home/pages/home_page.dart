@@ -79,118 +79,163 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       body: Column(
         children: [
-          // Custom Header
+          // Modern Clean Header
           Container(
             padding: EdgeInsets.only(
               top: MediaQuery.of(context).padding.top + 10,
-              bottom: 10,
-              left: 16,
-              right: 16,
+              bottom: 20,
+              left: 20,
+              right: 20,
             ),
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.redPrimary, Color(0xFFEF4444)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+              color: AppColors.surface,
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 15,
+                  offset: Offset(0, 5),
+                ),
+              ],
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          'Welcome back,',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          'Shop Store 🛍️',
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Consumer<CartService>(
+                      builder: (context, cartService, child) {
+                        final cartCount = cartService.totalItems;
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              // Navigate to cart
+                            },
+                            icon: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                const Icon(
+                                  Iconsax.shopping_bag,
+                                  color: AppColors.primary,
+                                  size: 24,
+                                ),
+                                if (cartCount > 0)
+                                  Positioned(
+                                    top: -5,
+                                    right: -5,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.accent,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 16,
+                                        minHeight: 16,
+                                      ),
+                                      child: Text(
+                                        '$cartCount',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Iconsax.search_normal,
+                        color: AppColors.textSecondary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          onChanged: _onSearchChanged,
+                          decoration: const InputDecoration(
+                            hintText: 'Search products...',
+                            hintStyle: TextStyle(
+                              color: AppColors.textHint,
+                              fontSize: 15,
+                            ),
+                            border: InputBorder.none,
+                            isDense: true,
+                          ),
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                      if (_searchController.text.isNotEmpty)
+                        GestureDetector(
+                          onTap: () {
+                            _searchController.clear();
+                            _onSearchChanged('');
+                          },
+                          child: const Icon(
+                            Icons.close,
+                            color: AppColors.textSecondary,
+                            size: 18,
+                          ),
+                        )
+                      else
                         const Icon(
-                          Iconsax.search_normal,
-                          color: Colors.grey,
+                          Iconsax.setting_4,
+                          color: AppColors.primary,
                           size: 20,
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: _onSearchChanged,
-                            textAlignVertical: TextAlignVertical.center,
-                            decoration: const InputDecoration(
-                              hintText: 'Tingoan Store',
-                              hintStyle: TextStyle(
-                                color: AppColors
-                                    .redPrimary, // Or grey if preferred
-                                fontSize: 14,
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.zero,
-                              isDense: true,
-                            ),
-                            style: const TextStyle(
-                              color: Colors.black87,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                        if (_searchController.text.isNotEmpty)
-                          GestureDetector(
-                            onTap: () {
-                              _searchController.clear();
-                              _onSearchChanged('');
-                            },
-                            child: const Icon(
-                              Icons.close,
-                              color: Colors.grey,
-                              size: 16,
-                            ),
-                          )
-                        else
-                          const Icon(
-                            Iconsax.camera,
-                            color: Colors.grey,
-                            size: 20,
-                          ),
-                      ],
-                    ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: 16),
-                Consumer<CartService>(
-                  builder: (context, cartService, child) {
-                    final cartCount = cartService.totalItems;
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        const Icon(Iconsax.bag_2, color: Colors.white, size: 26),
-                        if (cartCount > 0)
-                          Positioned(
-                            top: -4,
-                            right: -4,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Text(
-                                cartCount > 99 ? '99+' : '$cartCount',
-                                style: const TextStyle(
-                                  color: AppColors.redPrimary,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    );
-                  },
                 ),
               ],
             ),
@@ -202,17 +247,25 @@ class _HomePageState extends State<HomePage> {
               child: CustomScrollView(
                 slivers: [
                   const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                  const SliverToBoxAdapter(child: BannerSlider()),
+                  SliverToBoxAdapter(
+                    child: BannerSlider(
+                      imageUrls: _allProducts
+                          .take(5)
+                          .map((p) => p.image)
+                          .toList(),
+                    ),
+                  ),
                   const SliverToBoxAdapter(child: SizedBox(height: 12)),
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 4.0),
                       child: Text(
-                        'GỢI Ý HÔM NAY',
+                        'RECOMENDED FOR YOU',
                         style: TextStyle(
-                          color: AppColors.redPrimary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 18,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
@@ -225,7 +278,7 @@ class _HomePageState extends State<HomePage> {
                         padding: EdgeInsets.all(20.0),
                         child: Center(
                           child: CircularProgressIndicator(
-                            color: AppColors.redPrimary,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),

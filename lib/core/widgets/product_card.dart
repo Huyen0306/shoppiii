@@ -30,273 +30,186 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image Section
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(8),
-                ),
-                child: AspectRatio(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image Section
+            Stack(
+              children: [
+                AspectRatio(
                   aspectRatio: imageAspectRatio,
                   child: Image.network(
                     imageUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[200],
-                      child: const Icon(Iconsax.image, color: Colors.grey),
-                    ),
-                  ),
-                ),
-              ),
-              // Discount Tag
-              if (discount != null)
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 2,
-                    ),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFFE9E9),
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      discount!,
-                      style: const TextStyle(
-                        color: AppColors.redPrimary,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                      color: AppColors.background,
+                      child: const Icon(
+                        Iconsax.image,
+                        color: AppColors.textHint,
                       ),
                     ),
                   ),
                 ),
-              // Bottom Promo Banner (Voucher Xtra)
-              Positioned(
-                bottom: 0,
-                left: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 2,
-                  ),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFFFFB700), Color(0xFFFF8C00)],
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '15.1',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        color: Colors.white,
-                        child: const Text(
-                          'VOUCHER XTRA',
-                          style: TextStyle(
-                            color: Color(0xFFFF8C00),
-                            fontSize: 8,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          // Info Section
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title with LIVE badge
-                Text.rich(
-                  TextSpan(
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 12,
-                      height: 1.3,
-                    ),
-                    children: [
-                      if (isLive)
-                        WidgetSpan(
-                          alignment: PlaceholderAlignment.middle,
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 4),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 1,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.redPrimary,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Iconsax
-                                      .video5, // sensors -> video/live alternative
-                                  size: 8,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(width: 2),
-                                Text(
-                                  'LIVE',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      TextSpan(text: title),
-                    ],
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-
-                const SizedBox(height: 6),
-
-                // Badges (Rẻ vô địch, Rating)
-                Row(
-                  children: [
-                    Container(
+                // Discount Tag (Subtle)
+                if (discount != null)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 2,
+                        horizontal: 8,
+                        vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.redPrimary,
-                        borderRadius: BorderRadius.circular(1),
+                        color: AppColors.accent,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        discount!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                // Live Tag
+                if (isLive)
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Iconsax.like_1, size: 8, color: Colors.white),
-                          SizedBox(width: 2),
+                          Icon(Icons.circle, size: 6, color: Colors.red),
+                          SizedBox(width: 4),
                           Text(
-                            'Rẻ Vô Địch',
+                            'LIVE',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 8,
+                              fontSize: 10,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    if (rating != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 4,
-                          vertical: 1,
+                  ),
+              ],
+            ),
+
+            // Info Section
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        price,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
                         ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.amber, width: 0.5),
-                          borderRadius: BorderRadius.circular(1),
-                        ),
-                        child: Row(
+                      ),
+                      if (rating != null)
+                        Row(
                           children: [
                             const Icon(
                               Iconsax.star1,
-                              size: 8,
+                              size: 14,
                               color: Colors.amber,
                             ),
-                            const SizedBox(width: 2),
+                            const SizedBox(width: 4),
                             Text(
                               rating.toString(),
                               style: const TextStyle(
-                                fontSize: 8,
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                  ],
-                ),
-
-                const SizedBox(height: 6),
-
-                // Price and Sold count
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      price,
-                      style: const TextStyle(
-                        color: AppColors.redPrimary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (soldCount != null)
-                      Text(
-                        'Đã bán $soldCount',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 10),
-                      ),
-                  ],
-                ),
-
-                if (shippingText != null) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(
-                        Iconsax.truck_fast,
-                        size: 12,
-                        color: Color(0xFF26AA99),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        shippingText!,
-                        style: const TextStyle(
-                          color: Color(0xFF26AA99),
-                          fontSize: 10,
-                        ),
-                      ),
                     ],
                   ),
+                  const SizedBox(height: 8),
+                  if (soldCount != null || shippingText != null)
+                    Row(
+                      children: [
+                        if (soldCount != null)
+                          Text(
+                            'Sold $soldCount',
+                            style: const TextStyle(
+                              color: AppColors.textHint,
+                              fontSize: 11,
+                            ),
+                          ),
+                        if (soldCount != null && shippingText != null)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              '•',
+                              style: TextStyle(color: AppColors.textHint),
+                            ),
+                          ),
+                        if (shippingText != null)
+                          Expanded(
+                            child: Text(
+                              shippingText!,
+                              style: const TextStyle(
+                                color: Color(0xFF10B981), // Success green
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                      ],
+                    ),
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

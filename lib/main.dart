@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: AuthService()),
       ],
       child: MaterialApp(
-        title: 'Shoppiii',
+        title: 'Shop',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         home: const AuthWrapper(),
